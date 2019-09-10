@@ -1,0 +1,3 @@
+---
+# defaults file for check_ping
+ping_count: 4

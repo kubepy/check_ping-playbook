@@ -1,0 +1,8 @@
+[ping_source]
+localhost ansible_connection=local
+
+[ping_target]
+www.google.com
+www.google.comz
+www.baidu.com
+www.ipip.net

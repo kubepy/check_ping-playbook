@@ -1,0 +1,5 @@
+- hosts: ping_source
+  gather_facts: false
+  become: false
+  roles:
+    - check_ping

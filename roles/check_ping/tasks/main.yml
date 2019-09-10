@@ -1,0 +1,30 @@
+---
+# tasks file for check_ping
+
+- name: Fetch the current system timestamp
+  set_fact:
+    fetch_timestamp: "{{ lookup('pipe', 'date --utc +%Y%m%dT%H%M%S') }}"
+
+- shell: truncate -s 0 /tmp/ping_results
+
+- name: test
+  shell: |
+    ping -c {{ ping_count }} {{ item }} > /tmp/ping_{{ item }}
+    if [ "$?" -eq 0 ]; then
+        delay=`sed -n 's/^.*time=\(.*\) ms/\1/p' /tmp/ping_{{ item }} | awk '{sum+=$1} END{print sum/NR}'` ;
+        echo "{{ item }} OK ${delay}ms" >> /tmp/ping_results ;
+    else
+        echo "{{ item }} Failed 0ms" >> /tmp/ping_results ;
+    fi
+  with_items: "{{ groups['ping_target'] }}"
+  register: ping_result
+
+- debug:
+    msg: "{{ ping_result }}"
+
+- shell: cat /tmp/ping_results
+  register: ping_results
+
+- debug:
+    msg: "{{ (item.split())[0:] | join(' ') }}"
+  loop: "{{ ping_results.stdout.splitlines() }}"
